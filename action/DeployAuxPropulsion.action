@@ -1,0 +1,11 @@
+bool retract
+bool extend
+---
+std_msgs/Header header 
+bool retracted
+bool extended
+---
+std_msgs/Header header 
+float32 sec_to_finish
+float32 sec_from_start
+float32 fraction_complete
