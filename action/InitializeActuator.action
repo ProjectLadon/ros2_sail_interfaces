@@ -1,0 +1,8 @@
+float32 voltage
+---
+float32 absolute_encoder_value
+float32 steps_per_volt
+int32 incremental_encoder_value
+---
+float32 absolute_feedback
+int32 incremental_feedback

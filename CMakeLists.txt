@@ -22,8 +22,14 @@ rosidl_generate_interfaces(${PROJECT_NAME}
     "msg/SailState.msg"
     "msg/AuxPropulsionFeedback.msg"
     "msg/PwmOutput.msg"
+    "msg/AnalogInput.msg"
     "action/DeployAuxPropulsion.action"
+    "action/InitializeActuator.action"
     DEPENDENCIES builtin_interfaces std_msgs)
+
+install(DIRECTORY include/
+  DESTINATION include
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
