@@ -23,6 +23,11 @@ rosidl_generate_interfaces(${PROJECT_NAME}
     "msg/AuxPropulsionFeedback.msg"
     "msg/PwmOutput.msg"
     "msg/AnalogInput.msg"
+    "msg/PidTuning.msg"
+    "msg/PidDebug.msg"
+    "srv/GetPidTuning.srv"
+    "srv/SetPidTuning.srv"
+    "srv/SwitchPidDebug.srv"
     "action/DeployAuxPropulsion.action"
     "action/InitializeActuator.action"
     DEPENDENCIES builtin_interfaces std_msgs)
