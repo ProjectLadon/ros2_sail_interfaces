@@ -1,4 +1,6 @@
 # Turning PID debug output on or off 
+uint8 id                # loop identifier for nodes with multiple PID controllers
+string label            # loop label for nodes with multiple PID controllers 
 bool debug 
 ---
 bool success
