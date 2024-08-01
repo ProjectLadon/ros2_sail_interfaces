@@ -32,9 +32,11 @@ rosidl_generate_interfaces(${PROJECT_NAME}
     "action/InitializeActuator.action"
     DEPENDENCIES builtin_interfaces std_msgs)
 
-install(DIRECTORY include/
-  DESTINATION include
+install(DIRECTORY include/${PROJECT_NAME}
+  DESTINATION include/${PROJECT_NAME}
 )
+
+ament_export_include_directories(include)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
