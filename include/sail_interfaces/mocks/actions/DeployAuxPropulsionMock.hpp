@@ -1,6 +1,6 @@
 /**
  * 
- * (c) Ladon Robotics 2023
+ * (c) Ladon Robotics 2024
  * 
  * All rights reserved
  * 
@@ -34,9 +34,9 @@ namespace sail_interfaces_mocks
         {
             actionServer = rclcpp_action::create_server<Deploy>(
                 this, action_name, 
-                std::bind(&DeployAuxPropulsionMock::handle_goal, this, std::placeholders::_1, std::placeholders::_2), 
-                std::bind(&DeployAuxPropulsionMock::handle_cancel, this, std::placeholders::_1), 
-                std::bind(&DeployAuxPropulsionMock::handle_accepted, this, std::placeholders::_1)
+                std::bind(&DeployAuxPropulsionMockServer::handle_goal, this, std::placeholders::_1, std::placeholders::_2), 
+                std::bind(&DeployAuxPropulsionMockServer::handle_cancel, this, std::placeholders::_1), 
+                std::bind(&DeployAuxPropulsionMockServer::handle_accepted, this, std::placeholders::_1)
             );
             isAccept = true;
             isActive = false;
