@@ -1,7 +1,7 @@
 # ROS2 message to go with the WIND_DATA mavlink message (part of the ladon_robotics dialect)
 std_msgs/Header header
 
-uint8 WIND_DATA_TYPE_RAW        = 0     # The wind is raw 
+uint8 WIND_DATA_TYPE_RAW        = 0     # The wind is raw and unprocessed from the sensor
 uint8 WIND_DATA_TYPE_APPARENT   = 1     # The wind data is relative to the boat 
 uint8 WIND_DATA_TYPE_TRUE       = 2     # The wind data is relative to the ground 
 uint8 WIND_DATA_TYPE_INVALID    = 255   # The wind is invalid 
