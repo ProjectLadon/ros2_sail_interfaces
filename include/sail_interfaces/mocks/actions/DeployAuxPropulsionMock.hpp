@@ -15,13 +15,24 @@
 #include <tuple>
 
 #include "rclcpp/rclcpp.hpp"
+#include "rclcpp_lifecycle/lifecycle_node.hpp"
+#include "rclcpp_lifecycle/lifecycle_publisher.hpp"
+
+#include "lifecycle_msgs/msg/transition_event.hpp"
+#include "lifecycle_msgs/msg/state.hpp"
+#include "lifecycle_msgs/msg/transition.hpp"
+
+#include "lifecycle_msgs/srv/change_state.hpp"
+#include "lifecycle_msgs/srv/get_state.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "sail_interfaces/action/deploy_aux_propulsion.hpp"
 #include "std_msgs/msg/header.hpp"
 
+using namespace std::literals::chrono_literals;
+
 namespace sail_interfaces_mocks
 {
-    class DeployAuxPropulsionMockServer : public rclcpp::Node
+    class DeployAuxPropulsionMockServer : public rclcpp_lifecycle::LifecycleNode
     {
     public:
         using Deploy = sail_interfaces::action::DeployAuxPropulsion;
@@ -30,7 +41,7 @@ namespace sail_interfaces_mocks
         explicit  DeployAuxPropulsionMockServer (
             const std::string &node_name, 
             const std::string &action_name) 
-            : Node (node_name, rclcpp::NodeOptions())
+            : rclcpp_lifecycle::LifecycleNode(node_name, rclcpp::NodeOptions().use_intra_process_comms(false))
         {
             actionServer = rclcpp_action::create_server<Deploy>(
                 this, action_name, 
@@ -40,7 +51,67 @@ namespace sail_interfaces_mocks
             );
             isAccept = true;
             isActive = false;
+            mWaitNanos = 0;
+            mConfigureHits = 0;
+            mActivateHits = 0;
+            mDeActivateHits = 0;
+            mCleanupHits = 0;
+            mShutdownHits = 0;
         }
+        rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+            on_configure(const rclcpp_lifecycle::State &state)
+        {
+            std::this_thread::sleep_for(mWaitNanos * 1ns);
+            currentState = state;
+            mConfigureHits++;
+            return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+        }
+
+        rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+            on_activate(const rclcpp_lifecycle::State &state)
+        {
+            std::this_thread::sleep_for(mWaitNanos * 1ns);
+            currentState = state;
+            mActivateHits++;
+            return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+        
+        }
+
+        rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+            on_deactivate(const rclcpp_lifecycle::State &state)
+        {
+            std::this_thread::sleep_for(mWaitNanos * 1ns);
+            currentState = state;
+            mDeActivateHits++;
+            return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+        
+        }
+
+        rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+            on_cleanup(const rclcpp_lifecycle::State &state)
+        {
+            std::this_thread::sleep_for(mWaitNanos * 1ns);
+            currentState = state;
+            mCleanupHits++;
+            return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+        }
+
+        rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+            on_shutdown(const rclcpp_lifecycle::State &state)
+        {
+            std::this_thread::sleep_for(mWaitNanos * 1ns);
+            currentState = state;
+            mShutdownHits++;
+            return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+        } 
+
+        const rclcpp_lifecycle::State getState() { return currentState; }
+        void set_wait(double secs) { mWaitNanos = secs * 1e9; }
+        long getConfigureHits() { return mConfigureHits; }
+        long getActivateHits() { return mActivateHits; }
+        long getDeactivateHits() { return mDeActivateHits; }
+        long getCleanupHits() { return mCleanupHits; }
+        long getShutdownHits() { return mShutdownHits; }
 
         bool is_active() { return isActive; }
         bool is_accepting() { return isAccept; }
@@ -65,6 +136,7 @@ namespace sail_interfaces_mocks
             feedback->sec_from_start = sec_from_start;
             feedback->fraction_complete = fraction_complete;
             feedback->header = header;
+            RCLCPP_INFO(this->get_logger(), "Generating action feedback");
             handle->publish_feedback(feedback);
             return true;
         }
@@ -85,12 +157,15 @@ namespace sail_interfaces_mocks
             switch (result_code)
             {
                 case rclcpp_action::ResultCode::SUCCEEDED:
+                    RCLCPP_INFO(this->get_logger(), "Ending action with success");
                     handle->succeed(result);
                     break;
                 case rclcpp_action::ResultCode::ABORTED:
+                    RCLCPP_INFO(this->get_logger(), "Ending action with abort");
                     handle->abort(result);
                     break;
                 case rclcpp_action::ResultCode::CANCELED:
+                    RCLCPP_INFO(this->get_logger(), "Ending action with cancel");
                     handle->canceled(result);
                     break;
                 case rclcpp_action::ResultCode::UNKNOWN:
@@ -99,6 +174,7 @@ namespace sail_interfaces_mocks
                     return false;
             }
             isActive = false;
+            isAccept = true;
             return true;
         }
 
@@ -109,6 +185,13 @@ namespace sail_interfaces_mocks
         bool isActive;
         bool isDefer;
         bool wasCanceled;
+        rclcpp_lifecycle::State currentState;
+        long unsigned int mWaitNanos;
+        long mConfigureHits;
+        long mActivateHits;
+        long mDeActivateHits;
+        long mCleanupHits;
+        long mShutdownHits;
 
         rclcpp_action::GoalResponse handle_goal(
             const rclcpp_action::GoalUUID &uuid,
@@ -124,8 +207,9 @@ namespace sail_interfaces_mocks
             const std::shared_ptr<GoalHandleDeploy> handle
         )
         {
-            isActive = false;
+            RCLCPP_INFO(this->get_logger(), "Received cancel request");
             wasCanceled = true;
+            isAccept = true;
             return rclcpp_action::CancelResponse::ACCEPT;
         }
 
