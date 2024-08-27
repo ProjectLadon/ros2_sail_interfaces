@@ -30,6 +30,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
     "srv/SwitchPidDebug.srv"
     "action/DeployAuxPropulsion.action"
     "action/InitializeActuator.action"
+    "action/DeploySail.action"
     DEPENDENCIES builtin_interfaces std_msgs)
 
 install(DIRECTORY include/${PROJECT_NAME}
