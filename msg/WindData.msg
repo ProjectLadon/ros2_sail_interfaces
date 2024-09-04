@@ -18,8 +18,8 @@ uint8 SAIL_POS_ID_8             = 8     # Wingsail #8
 uint8 SAIL_POS_ID_FORE          = 20    # The forward most sail on a boat 
 uint8 SAIL_POS_ID_MAIN          = 21    # The middle sail on a boat 
 uint8 SAIL_POS_ID_MIZZEN        = 22    # The aft most sail on a boat 
-uint8 SAIL_POS_HULL             = 101   # Indicates a source fixed to the hull
-uint8 SAIL_POS_MIXED            = 201   # Indicates a mixed value
+uint8 SAIL_POS_ID_HULL          = 101   # Indicates a source fixed to the hull
+uint8 SAIL_POS_ID_MIXED         = 201   # Indicates a mixed value
 uint8 SAIL_POS_ID_NONE          = 255   # No wingsail defined 
 
 uint8 source_sail   # enum
